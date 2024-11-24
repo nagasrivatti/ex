@@ -1,0 +1,57 @@
+import java.io.*;
+import java.util.*;
+class SharedResource
+{
+    private boolean available=false;
+    public synchronized void produce()
+    {
+        try {
+            while(available)
+            {
+                wait();
+            }
+            System.out.println("produce");
+            available=true;
+            notify();
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    public synchronized void consume()
+    {
+        try{
+            while(!available){
+                wait();
+            }
+            System.out.println("consume");
+            available=false;
+            notify();
+        }
+        catch(InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
+}
+    class Main{
+     public static void main (String[] args) {
+        /* code */
+        SharedResource resource=new SharedResource();
+        Thread produce=new Thread(()->{
+            for(int i=0;i<3;i++)
+            {
+                resource.produce();
+            }
+        });
+        Thread consume=new Thread(()->{
+                        for(int i=0;i<3;i++){
+                            resource.consume();
+                        }
+
+        });
+        produce.start();
+        consume.start();
+    }
+    }
+o/p
